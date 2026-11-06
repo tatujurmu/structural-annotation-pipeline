@@ -7,5 +7,5 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=8000
 
-module load python-data/3.12-25.09
+module load python-data/3.12-31.03
 python3 01_filter_post_eggnog.py "$RUN_ID"

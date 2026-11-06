@@ -9,12 +9,12 @@ if len(sys.argv) != 2:
 run_id = sys.argv[1]
 
 # ── Read raw data ──────────────────────────────────────────────────────────────
-raw_data_path = f"../data/processed/{run_id}_eggnog_raw.tsv"
+raw_data_path = f"../results/{run_id}/00_numbered_fasta/{run_id}_eggnog_raw.tsv"
 raw_data = pd.read_csv(raw_data_path, header=0, sep="\t")
 
 # ── Read eggNOG annotations ────────────────────────────────────────────────────
 eggnog_annotations_raw = (
-    f"../results/1_eggnog_out/{run_id}_eggnog_out.emapper.annotations"
+    f"../results/{run_id}/01_eggnog/{run_id}_eggnog_out.emapper.annotations"
 )
 
 # Strip leading '#' from every line so the real header row becomes parseable
@@ -61,7 +61,9 @@ NA15_b1000_df = NA15_df[NA15_df["length"] <= 1000]
 
 
 #create fasta file
-output_path = f"../data/processed/{run_id}_eggnog_filtered.fasta"
+output_dir = f"../results/{run_id}/01_eggnog_filtered"
+os.makedirs(output_dir, exist_ok=True)
+output_path = f"{output_dir}/{run_id}_eggnog_filtered.fasta"
 
 with open(output_path, "w") as f:
     for _, row in NA15_b1000_df.iterrows():

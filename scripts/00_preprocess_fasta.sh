@@ -9,7 +9,8 @@
 #SBATCH --output=../logs/01_preprocessing_%j.out
 #SBATCH --error=../logs/01_preprocessing_%j.err
 
-module load seqkit
+module load bio-apps/v202603
+module load seqkit/2.13.0
 
 #how many seq
 files=(../data/raw/*.fasta)
@@ -27,8 +28,8 @@ fi
 
 INPUT_FILE="${files[0]}"
 STEM=$(basename "${INPUT_FILE}" .fasta)
-PROCESSED="../data/processed/${RUN_ID}_processed.fasta"
-mkdir -p ../data/processed
+PROCESSED="../results/${RUN_ID}/00_processed_fasta/${RUN_ID}_processed.fasta"
+mkdir -p "../results/${RUN_ID}/00_processed_fasta"
 
 
 #delete if ends with * and remove line wrappings

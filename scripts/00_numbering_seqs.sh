@@ -8,5 +8,5 @@
 #SBATCH --mem=8000
 
 
-module load python-data/3.12-25.09
+module load python-data/3.12-31.03
 python3 00_numbering_seqs.py "$RUN_ID"

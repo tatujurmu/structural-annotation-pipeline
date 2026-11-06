@@ -22,10 +22,10 @@ module load mmseqs2/18-8cc5c
 
 
 mkdir -p $LOCAL_SCRATCH/msas/msa/1
-rsync -a ../results/2_colabfold_MSA_step/${RUN_ID}/ $LOCAL_SCRATCH/msas/msa/1/
+rsync -a ../results/${RUN_ID}/02_colabfold_MSA/ $LOCAL_SCRATCH/msas/msa/1/
 
 INPUT_FOLDER="$LOCAL_SCRATCH/msas/msa/1"
-OUTPUT_FOLDER="../results/3_colabfold_structure_step/${RUN_ID}/"
+OUTPUT_FOLDER="../results/${RUN_ID}/03_colabfold_structure/"
 
 
 CB_START=$(date +%s)

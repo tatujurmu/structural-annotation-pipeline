@@ -1,20 +1,24 @@
 import sys
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent.parent / "data" / "processed"
-OUT_DIR  = Path(__file__).parent.parent / "data" / "processed"
+RESULTS_BASE = Path(__file__).parent.parent / "results"
 
 if len(sys.argv) != 2:
     sys.exit(f"Usage: {sys.argv[0]} RUN_ID")
 run_id = sys.argv[1]
+
+RUN_DIR = RESULTS_BASE / run_id
+DATA_DIR = RUN_DIR / "00_processed_fasta"
+NUMBERED_DIR = RUN_DIR / "00_numbered_fasta"
+OUT_DIR = NUMBERED_DIR
 
 input_file = DATA_DIR / f"{run_id}_processed.fasta"
 if not input_file.exists():
     sys.exit(f"Processed FASTA not found: {input_file}")
 print(f"Input: {input_file}")
 
-OUT_DIR.mkdir(parents=True, exist_ok=True)
-output_file = OUT_DIR / f"{run_id}_numbered.fasta"
+NUMBERED_DIR.mkdir(parents=True, exist_ok=True)
+output_file = NUMBERED_DIR / f"{run_id}_numbered.fasta"
 
 records = []
 count = 1

@@ -22,7 +22,7 @@ module load localcolabfold/1.5.5
 module load mmseqs2/18-8cc5c
 
 #PATHS
-INPUT_FILE="../data/processed/${RUN_ID}_eggnog_filtered.fasta"
+INPUT_FILE="../results/${RUN_ID}/01_eggnog_filtered/${RUN_ID}_eggnog_filtered.fasta"
 MMSEQS_PATH="/appl/soft/bio/mmseqs2/mmseqs2_bin/mmseqs2-18-8cc5c/bin/mmseqs"
 
 #FOLDERS
@@ -68,6 +68,6 @@ echo -e "${FORMATTED_RUNTIME}\n${FORMATTED_DB_TIME}\n${FORMATTED_CSCB_TIME}"
 echo -e "${FORMATTED_RUNTIME}\n${FORMATTED_DB_TIME}\n${FORMATTED_CSCB_TIME}" >&2
 
 echo -e "\n ---- transferring files... ---- "
-mkdir -p ../results/2_colabfold_MSA_step/${RUN_ID}
-cp -a ${WORK_FOLDER}/msa_${SLURM_JOB_ID}_idx/. ../results/2_colabfold_MSA_step/${RUN_ID}/
+mkdir -p ../results/${RUN_ID}/02_colabfold_MSA
+cp -a ${WORK_FOLDER}/msa_${SLURM_JOB_ID}_idx/. ../results/${RUN_ID}/02_colabfold_MSA/
     

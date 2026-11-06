@@ -10,17 +10,18 @@
 #SBATCH --error=../logs/01_eggnog_%j.err
 
 
-mkdir -p "../results/1_eggnog_out"
+mkdir -p "../results/${RUN_ID}/01_eggnog"
 
 
 # ===== Configuration =====
-INPUT_FILE="../data/processed/${RUN_ID}_numbered.fasta"
-OUTPUT_PREFIX="../results/1_eggnog_out/${RUN_ID}_eggnog_out"
+INPUT_FILE="../results/${RUN_ID}/00_numbered_fasta/${RUN_ID}_numbered.fasta"
+OUTPUT_PREFIX="../results/${RUN_ID}/01_eggnog/${RUN_ID}_eggnog_out"
 
 
-# set paths
-EGGNOG_BIN="/projappl/project_2014323/eggnog-mapper2/eggnog-mapper2_tykky/bin"
-DATA_DIR="/scratch/project_2014323/eggnog_data"
+# load modules (provides emapper.py and sets EGGNOG_DATA_DIR)
+module load bio-apps/v202603
+module load eggnog-mapper/2.1.15
+DATA_DIR="${EGGNOG_DATA_DIR}"
 
 
 #print initialization data
@@ -52,7 +53,7 @@ echo ""
 echo "Running eggNOG-mapper2..."
 echo ""
 
-bash ${EGGNOG_BIN}/emapper.py \
+emapper.py \
     -i ${INPUT_FILE} \
     -o ${OUTPUT_PREFIX} \
     --data_dir ${DATA_DIR} \

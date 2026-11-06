@@ -9,7 +9,7 @@ if len(sys.argv) < 2:
 run_id = sys.argv[1]
 min_plddt = 70.0
 
-input_dir = Path(f"../results/3_colabfold_structure_step/{run_id}")
+input_dir = Path(f"../results/{run_id}/03_colabfold_structure")
 output_dir = input_dir / "rank001_filtered"
 output_dir.mkdir(parents=True, exist_ok=True)
 
