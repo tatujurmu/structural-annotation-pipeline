@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 #SBATCH --job-name=02_CF_MSA
 #SBATCH --account=project_2014323
 #SBATCH --partition=gpumedium
@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --array=0-0
 #SBATCH --mem=370000
-#SBATCH --gres=gpu:gh200:1,nvme:1490
+#SBATCH --gres=gpu:gh200:1
 #SBATCH --output=../logs/02_CF_MSA_%a_%A.out
 #SBATCH --error=../logs/02_CF_MSA_%a_%A.err
 #SBATCH --mail-type=END
@@ -24,15 +24,20 @@ SING_IMAGE="/projappl/project_2014323/colabfold/colabfold_1.6.2-cuda13.sif"
 
 #PATHS
 INPUT_FILE="../results/${RUN_ID}/01_eggnog_filtered/${RUN_ID}_eggnog_filtered.fasta"
-MMSEQS_PATH="/appl/soft/manual/bio/x86_64/spackenvs/bapps_v202603/install_dir/zen5/gcc-14.3.0/mmseqs2-18-8cc5c-is6igm/bin/mmseqs"
+MMSEQS_PATH="/appl/soft/manual/bio/aarch64/spackenvs/bapps_v202603/install_dir/neoverse_v2/gcc-14.3.0/mmseqs2-18-8cc5c-ayeker/bin/mmseqs"
 
 #FOLDERS
-mkdir -p $LOCAL_SCRATCH/${SLURM_ARRAY_TASK_ID}
-WORK_FOLDER=$LOCAL_SCRATCH/${SLURM_ARRAY_TASK_ID}
-mkdir -p $WORK_FOLDER/database
-
-echo -e "\n ---- downloading DB ---- "
-cp -a /scratch/project_2014323/tjurmu/colabfold/db/database/. ${WORK_FOLDER}/database/
+mkdir -p $TMPDIR/${SLURM_ARRAY_TASK_ID}
+WORK_FOLDER=$TMPDIR/${SLURM_ARRAY_TASK_ID}
+# mkdir -p $WORK_FOLDER/database
+#
+# echo -e "\n ---- downloading DB ---- "
+# cp -a /scratch/project_2014323/dbs/colabfold/. ${WORK_FOLDER}/database/
+# removed: GPU partitions (gpumedium/gpularge) only get reservable $LOCAL_SCRATCH
+# on XL/V nodes, not here — using automatic $TMPDIR instead (150GiB on G-type
+# allocations). The 1.3TB colabfold DB still can't fit there, so colabfold_search
+# reads it straight off persistent /scratch below.
+DB_PATH="/scratch/project_2014323/dbs/colabfold"
 
 
 DB_END_TIME=$(date +%s)
@@ -41,13 +46,13 @@ CS_START=$(date +%s)
 
 echo -e "\n ---- colabfold_search ---- "
 
-time srun apptainer exec --nv --bind /users,/scratch,/run/nvme,/appl $SING_IMAGE \
+time apptainer exec --nv --bind="/users,/projappl,/scratch,/appl,$TMPDIR" $SING_IMAGE \
 colabfold_search \
 --threads $SLURM_CPUS_PER_TASK \
 --gpu 1 \
 --mmseqs $MMSEQS_PATH \
 $INPUT_FILE \
-${WORK_FOLDER}/database \
+${DB_PATH} \
 ${WORK_FOLDER}/msa_${SLURM_JOB_ID}_idx
 
 
@@ -72,4 +77,5 @@ echo -e "${FORMATTED_RUNTIME}\n${FORMATTED_DB_TIME}\n${FORMATTED_CSCB_TIME}" >&2
 echo -e "\n ---- transferring files... ---- "
 mkdir -p ../results/${RUN_ID}/02_colabfold_MSA
 cp -a ${WORK_FOLDER}/msa_${SLURM_JOB_ID}_idx/. ../results/${RUN_ID}/02_colabfold_MSA/
-    
+
+echo -e "\n ----------------------------------------------- "

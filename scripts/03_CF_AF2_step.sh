@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 #SBATCH --job-name=03_CF_AF2_step
 #SBATCH --account=project_2014323
 #SBATCH --partition=gpumedium
@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=36G
-#SBATCH --gres=gpu:gh200:1,nvme:50
+#SBATCH --gres=gpu:gh200:1
 #SBATCH --output=../logs/03_CF_AF2_step_%A.out
 #SBATCH --error=../logs/03_CFAF2_step_%A.err
 
@@ -22,16 +22,22 @@ SING_IMAGE="/projappl/project_2014323/colabfold/colabfold_1.6.2-cuda13.sif"
 
 
 
-mkdir -p $LOCAL_SCRATCH/msas/msa/1
-rsync -a ../results/${RUN_ID}/02_colabfold_MSA/ $LOCAL_SCRATCH/msas/msa/1/
+mkdir -p $TMPDIR/msas/msa/1
+rsync -a ../results/${RUN_ID}/02_colabfold_MSA/ $TMPDIR/msas/msa/1/
 
-INPUT_FOLDER="$LOCAL_SCRATCH/msas/msa/1"
+echo -e "\n ---- staging AF2 params ---- "
+mkdir -p $TMPDIR/af2_params
+cp -a /scratch/project_2014323/dbs/af2_params/. $TMPDIR/af2_params/
+
+INPUT_FOLDER="$TMPDIR/msas/msa/1"
 OUTPUT_FOLDER="../results/${RUN_ID}/03_colabfold_structure/"
+DATA_DIR="$TMPDIR/af2_params"
 
 
 CB_START=$(date +%s)
-srun apptainer exec --nv --bind /users,/scratch,/run/nvme,/appl $SING_IMAGE \
+apptainer exec --nv --bind="/users,/projappl,/scratch,/appl,$TMPDIR" $SING_IMAGE \
 colabfold_batch \
+--data $DATA_DIR \
 --num-models 5 \
 --num-seeds 3 \
 --random-seed 1 \
