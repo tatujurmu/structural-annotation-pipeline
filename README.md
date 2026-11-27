@@ -1,6 +1,8 @@
 # Structural Annotation Pipeline
 
-An automated HPC pipeline for characterising protein sequences that have no known function. Sequences that eggNOG-mapper can already annotate are filtered out, 3D structures are predicted for the rest with ColabFold, and the structures are searched against structure databases with Foldseek to find distant relatives and possible functions.
+An automated HPC pipeline for characterising protein sequences with no known function. Sequences that eggNOG-mapper can already annotate are filtered out, 3D structures are predicted for the remaining sequences with ColabFold, and the resulting structures are searched against structural databases with Foldseek to identify distant homologues and potential functions.
+
+Developed on CSC Puhti and Mahti supercomputing environments as part of a Master's thesis project.
 
 **Current status**
 - Steps 00–03 run as an automated SLURM job chain (`run_pipeline.sh`)
@@ -28,7 +30,8 @@ An automated HPC pipeline for characterising protein sequences that have no know
 - Writes the remaining sequences to a new FASTA file for structure prediction
 
 **02_CF_MSA_step.sh**
-- Creates multiple sequence alignments (MSAs) with ColabFold, which are needed for structure prediction
+- Creates multiple sequence alignments (MSAs) with ColabFold, which are needed to guide structure prediction
+- Copies ColabFold databases to node-local NVMe storage (`$LOCAL_SCRATCH`) before execution to improve I/O performance.
 
 **03_CF_AF2_step.sh**
 - Predicts 3D structures with ColabFold (AlphaFold2) on GPU
@@ -38,7 +41,7 @@ An automated HPC pipeline for characterising protein sequences that have no know
 
 **separate/04_FS_FINAL_add_bfvd.sh** (run manually for the time being)
 - Searches the predicted structures against five structure databases with Foldseek
-- Keeps hits that are structurally similar (TM-score ≥ 0.5) but have low sequence identity (≤ 40 %)
+- Keeps hits that are structurally similar to the query protein (qTM-score ≥ 0.5) but have low sequence identity (fident ≤ 40 %)
 
 **separate/make_FSid_fasta.py** and **separate/05_run_eggnog_for_FS_outputs.sh** (run manually for the time being)
 - Collect the Foldseek hits into a FASTA file and annotate them with eggNOG-mapper to find possible functions for the query proteins
